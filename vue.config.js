@@ -2,7 +2,8 @@ const timeStamp = new Date().getTime()
 
 module.exports = {
   lintOnSave: false,
-  publicPath: process.env.NODE_ENV === 'production' ? '/vue-quasar-manage/' : '/',
+  // publicPath: process.env.NODE_ENV === 'production' ? '/vue-quasar-manage/' : '/',
+  publicPath: '/',
   devServer: {
     host: 'localhost',
     port: 8868,
