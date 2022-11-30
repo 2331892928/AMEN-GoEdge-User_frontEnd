@@ -1,0 +1,10 @@
+基于Vue-Quasar-Manage项目制作的AMEN-GoEdge-User的前端项目，用于管理AMEN-GoEdge-User用户后台
+由于GoEdge需要商业版才能用用户端，特此自己制作了用户端，现有功能：
+1.注册
+2.登录
+3.验证码
+4.网站管理
+5.添加/删除网站
+6.https设置(http2/强制https/https证书/hsts/开关http|s/ocps/tls)
+7.源站管理(支持端口/支持域名/支持ip/支持https/支持https证书/添加/删除)
+8.证书管理(一键绑定/添加/删除)
