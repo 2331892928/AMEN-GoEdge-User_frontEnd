@@ -1,0 +1,1 @@
+(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["chunk-2d0baaed"],{"37f9":function(e,n,t){"use strict";t.r(n);var u=function(){var e=this,n=e.$createElement,t=e._self._c||n;return t("div",[e._v("主页，暂时未做，主页另用域名做，vue不适合做主页")])},a=[],c=t("2877"),l={},r=Object(c["a"])(l,u,a,!1,null,null,null);n["default"]=r.exports}}]);
