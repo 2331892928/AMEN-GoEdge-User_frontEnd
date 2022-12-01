@@ -9,7 +9,7 @@ module.exports = {
     port: 8868,
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
+        target: 'http://cdnsss.rkru.cn',
         changeOrigin: true,
         pathRewrite: {
           '^/api': ''
