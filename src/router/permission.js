@@ -6,7 +6,7 @@ import constantRoutes from './constantRoutes'
 import { addTagView, setTagView } from '@/components/TagView/TagViewUtils'
 import { setBreadcrumbs } from '@/components/Breadcrumbs/BreadcrumbsUtils'
 import { getWebConfig } from '@/api/ConfigService'
-import { Cookies,Dark } from 'quasar'
+import { Cookies, Dark } from 'quasar'
 import { findAllUserServers } from '@/api/ServerService'
 
 router.beforeEach((to, from, next) => {
@@ -72,6 +72,9 @@ router.beforeEach((to, from, next) => {
       } else {
         // 模拟不存在用户权限时，获取用户权限
         const userRole = sessionStorage.getItem('user_role')
+        if (userRole === null) {
+          next({ path: '/logon' })
+        }
         // 并根据权限设置对应的路由
         store.commit('SET_ROLES_AND_ROUTES', userRole)
         // 如果提示 addRoutes 已弃用，使用扩展运算符完成该操作
