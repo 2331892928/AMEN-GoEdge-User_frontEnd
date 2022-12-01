@@ -5,7 +5,7 @@ const routerConfig = {
   // summaryUrl: rootUrl + '/summary',
   // transformUrl: rootUrl + '/transform',
   // keywordPickUrl: rootUrl + '/keywordpick'
-  proxy: 'http://localhost:8868/api',
+  proxy: '/api',
   ConfigService: {
     main: '/ConfigService',
     get: '/get'
