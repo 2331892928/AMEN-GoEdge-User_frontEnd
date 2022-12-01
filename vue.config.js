@@ -5,11 +5,12 @@ module.exports = {
   // publicPath: process.env.NODE_ENV === 'production' ? '/vue-quasar-manage/' : '/',
   // publicPath: '/',
   devServer: {
+    disableHostCheck: true,
     host: 'localhost',
     port: 8868,
     proxy: {
       '/api': {
-        target: 'http://cdnsss.rkru.cn',
+        target: 'http://localhost:8080',
         changeOrigin: true,
         pathRewrite: {
           '^/api': ''
