@@ -1085,6 +1085,13 @@ export default {
         if (e.data.code === 200) {
           var decData = utf8to16(window.atob(e.data.data))
           decData = JSON.parse(decData)
+          // 检查是否初始化中
+          if (decData.reverseProxyRef === null || decData.web === null){
+            this.$router.push('/domainName/domainNameList')
+            swal('站点不久前创建，需要一段时间初始化，请稍等几分钟再次操作!', {
+              icon: 'warning'
+            })
+          }
           this.doMainInfo.basic.domain = decData.serverNames[0].name
           this.doMainInfo.basic.name = decData.name
           this.doMainInfo.basic.cname = decData.cnameDomain
@@ -1111,10 +1118,15 @@ export default {
           this.doMainInfo.reverseProxy.data = []
           // 将数据保存进this，后续需要
           this.doMainInfo.reverseProxy.sourceData = decData
-          this.doMainInfo.reverseProxy.isOn = decData.reverseProxyRef.isOn
+
+          if (decData.reverseProxyRef === null){
+            this.doMainInfo.reverseProxy.isOn = false
+          } else {
+            this.doMainInfo.reverseProxy.isOn = decData.reverseProxyRef.isOn
+          }
 
           // 检查主和源是否为空，为空源数据则为[]，这里顺带检测
-          if (decData.reverseProxy.primaryOrigins === null) {
+          if (decData.reverseProxy === null || decData.reverseProxy.primaryOrigins === null) {
             this.doMainInfo.reverseProxy.data = []
             this.doMainInfo.reverseProxy.sourceData.reverseProxy.primaryOrigins = []
           } else {
@@ -1133,9 +1145,10 @@ export default {
           }
           this.loading_master_proxy = false
           //  备用源站
+
           this.loading_slave1_proxy = !this.loading_slave1_proxy
           this.doMainInfo.reverseProxy.alternateData = []
-          if (decData.reverseProxy.backupOrigins === null) {
+          if (decData.reverseProxy === null || decData.reverseProxy.backupOrigins === null) {
             this.doMainInfo.reverseProxy.sourceData.reverseProxy.backupOrigins = []
             this.doMainInfo.reverseProxy.alternateData = []
           } else {
@@ -1154,36 +1167,58 @@ export default {
           }
           this.loading_slave1_proxy = false
           // 第三页
+          // console.log(decData)
           // 是否启用https
           this.doMainInfo.HTTPS.HTTPS = decData.https.isOn
           // 是否启用http
           this.doMainInfo.HTTPS.HTTP = decData.http.isOn
           // 强制https
-          this.doMainInfo.HTTPS.isHTTPS = decData.web.redirectToHTTPS.isOn
           // 重定向
-          this.doMainInfo.HTTPS.HTTPSgroup = decData.web.redirectToHTTPS.status === 0 ? '301' : decData.web.redirectToHTTPS.status.toString()
-          // hsts
-          if (decData.https.sslPolicy.hsts !== null) {
+          if (decData.web === null) {
+            this.doMainInfo.HTTPS.isHTTPS = false
+            this.doMainInfo.HTTPS.HTTPSgroup = '301'
+          } else {
+            if (decData.web.redirectToHTTPS === null) {
+              this.doMainInfo.HTTPS.isHTTPS = false
+              this.doMainInfo.HTTPS.HTTPSgroup = '301'
+            } else {
+              this.doMainInfo.HTTPS.isHTTPS = decData.web.redirectToHTTPS.isOn
+              this.doMainInfo.HTTPS.HTTPSgroup = decData.web.redirectToHTTPS.status === 0 ? '301' : decData.web.redirectToHTTPS.status.toString()
+            }
+
+
+          }
+
+
+          if (decData.https.sslPolicy === null || decData.https.sslPolicy.hsts === null) {
+            this.doMainInfo.HTTPS.HSTS = false
+            this.doMainInfo.HTTPS.OCSP = false
+            this.doMainInfo.HTTPS.TLSversion = 'TLS 1.0'
+            this.doMainInfo.HTTPS.SSL = 0
+            this.doMainInfo.HTTPS.HTTP2 = false
+          } else {
+            // hsts
             this.doMainInfo.HTTPS.HSTS = decData.https.sslPolicy.hsts.isOn
             // hsts子选项
             this.doMainInfo.HTTPS.HSTSgroup.maxtime = decData.https.sslPolicy.hsts.maxAge
             this.doMainInfo.HTTPS.HSTSgroup.includeSubDomains = decData.https.sslPolicy.hsts.includeSubDomains
             this.doMainInfo.HTTPS.HSTSgroup.preload = decData.https.sslPolicy.hsts.preload
-          } else {
-            this.doMainInfo.HTTPS.HSTS = false
+            // ocps
+            this.doMainInfo.HTTPS.OCSP = decData.https.sslPolicy.ocspIsOn
+            // 最低tls
+            this.doMainInfo.HTTPS.TLSversion = decData.https.sslPolicy.minVersion
+            // ssl证书和当前使用
+            if (decData.https.sslPolicy.certs !== null && decData.https.sslPolicy.certs.length > 0) {
+              // this.doMainInfo.HTTPS.SSL = decData.https.sslPolicy.certs[0].name
+              this.doMainInfo.HTTPS.SSL = decData.https.sslPolicy.certs[0].id
+            } else {
+              // this.doMainInfo.HTTPS.SSL = '关闭'
+              this.doMainInfo.HTTPS.SSL = 0
+            }
+            // http2
+            this.doMainInfo.HTTPS.HTTP2 = decData.https.sslPolicy.http2Enabled
           }
-          // ocps
-          this.doMainInfo.HTTPS.OCSP = decData.https.sslPolicy.ocspIsOn
-          // 最低tls
-          this.doMainInfo.HTTPS.TLSversion = decData.https.sslPolicy.minVersion
-          // ssl证书和当前使用
-          if (decData.https.sslPolicy.certs !== null && decData.https.sslPolicy.certs.length > 0) {
-            // this.doMainInfo.HTTPS.SSL = decData.https.sslPolicy.certs[0].name
-            this.doMainInfo.HTTPS.SSL = decData.https.sslPolicy.certs[0].id
-          } else {
-            // this.doMainInfo.HTTPS.SSL = '关闭'
-            this.doMainInfo.HTTPS.SSL = 0
-          }
+
           // 列出证书列表
           listSSLCerts(0, 99999999, null).then((e) => {
             if (e.data.code === 200) {
@@ -1201,14 +1236,13 @@ export default {
           }).catch((e) => {
             console.log(e)
           })
-          // http2
-          this.doMainInfo.HTTPS.HTTP2 = decData.https.sslPolicy.http2Enabled
           Loading.hide()
         } else {
           swal(e.data.message, {
             icon: 'warning'
           })
           this.$router.push('/console')
+          Loading.hide()
         }
       })
     },
